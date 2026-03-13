@@ -48,7 +48,7 @@ All three Claude sessions must use this exact shape. Do not deviate without tell
 | Frontend | React + Tailwind CSS |
 | Backend | None — static JSON lookup, no server needed |
 | Data | Pre-processed `companies.json` bundled with app |
-| Job Listings | Active Jobs DB via RapidAPI (free tier) |
+| Job Listings | JSearch via RapidAPI (free Basic plan — 500 req/month) |
 | Data Sources | DOL H1B LCA disclosure CSVs + USCIS E-Verify employer list |
 
 **No database. No auth. No live scraping.** Everything runs locally from the bundled JSON for the demo.
@@ -80,8 +80,8 @@ Prompt to use with Claude:
 
 ## Integrations (Person 3)
 
-- **Active Jobs DB hook:** takes the user's job title query, hits Active Jobs DB API (RapidAPI), returns real job listings sourced directly from employer ATS platforms (Workday, Greenhouse, Lever, etc.), cross-references employer name against `companies.json` to inject sponsorship data. Preferred over JSearch because ATS-sourced employer names are canonical and match the DOL LCA data more reliably.
-- **Note:** Active Jobs DB recommends pre-fetching rather than ad-hoc queries. For the demo, pre-fetch a batch of CS/SWE listings and bundle alongside `companies.json`.
+- **JSearch hook:** takes the user's job title query, hits JSearch API (RapidAPI free Basic plan), returns real job listings from Google for Jobs. Cross-references `employer_name` against `companies.json` to inject sponsorship data. Use fuzzy/partial string matching (e.g. `fuse.js` or simple `.includes()`) since JSearch employer names from job boards may vary slightly from DOL LCA canonical names.
+- **Note:** Free Basic plan allows 500 requests/month — plenty for a hackathon demo.
 - **E-Verify filter toggle:** a UI toggle that filters results to only `everify: true` companies — this is the "wow factor" differentiator vs myvisajobs
 
 ---
@@ -114,4 +114,4 @@ Prompt to use with Claude:
 - E-Verify employer list: https://www.e-verify.gov
 - Inspiration / competitor: https://www.myvisajobs.com/reports/h1b/occupation//it-math-15/
 - Prior art (browser extension): F1 Hire (validates demand)
-- Active Jobs DB API: https://rapidapi.com/fantastic-jobs-fantastic-jobs-default/api/active-jobs-db
+- JSearch API on RapidAPI: https://rapidapi.com/letscrape-6bRBa3QguO5/api/jsearch
