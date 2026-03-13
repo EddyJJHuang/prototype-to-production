@@ -1,0 +1,25 @@
+Jane Doe
+jane.doe@email.com | linkedin.com/in/janedoe | github.com/janedoe
+
+EXPERIENCE
+
+Senior Software Engineer — Acme Corp (2021–Present)
+- Led development of real-time ML inference pipeline using Python, FastAPI, and AWS SageMaker
+- Reduced model latency by 40% through batching and caching strategies
+- Mentored 3 junior engineers; conducted weekly architecture reviews
+
+Machine Learning Engineer — DataCo (2018–2021)
+- Built and deployed NLP models (BERT, spaCy) for document classification
+- Managed feature engineering pipelines in Apache Spark and Airflow
+- Collaborated with product team to ship customer-facing recommendation features
+
+SKILLS
+Python, PyTorch, TensorFlow, scikit-learn, SQL, Spark, Airflow, Docker, Kubernetes,
+AWS (SageMaker, S3, EC2), FastAPI, Git, MLflow, Pandas, NumPy
+
+EDUCATION
+MS Computer Science (Machine Learning focus) — Stanford University, 2018
+BS Computer Engineering — University of Michigan, 2016
+
+CERTIFICATIONS
+AWS Certified Machine Learning Specialty
