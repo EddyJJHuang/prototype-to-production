@@ -46,43 +46,92 @@ All three Claude sessions must use this exact shape. Do not deviate without tell
 | Layer | Choice |
 |---|---|
 | Frontend | React + Tailwind CSS |
-| Backend | None — static JSON lookup, no server needed |
-| Data | Pre-processed `companies.json` bundled with app |
-| Job Listings | JSearch via RapidAPI (free Basic plan — 500 req/month) |
-| Data Sources | DOL H1B LCA disclosure CSVs + USCIS E-Verify employer list |
+| Backend | FastAPI server (`resume_matcher/api.py`) — runs locally on `localhost:8000` |
+| Data | `companies.json` — 24,362 USCIS FY2026 H-1B employers, loaded by the backend |
+| Job Listings | JSearch via RapidAPI (free Basic plan — 500 req/month), called from frontend |
+| Data Sources | USCIS FY2026 H-1B petition data |
 
-**No database. No auth. No live scraping.** Everything runs locally from the bundled JSON for the demo.
+**No database. No auth.** Backend must be running locally for the demo (`python api.py`).
 
 ---
 
-## Data Pipeline (Person 1)
+## User Flow
 
-Python script should:
-1. Download the DOL H1B LCA disclosure CSV from `dol.gov`
-2. Filter for CS/IT job titles
-3. Output top 500 companies as `companies.json` with the shared data shape above
-4. Script runs **once** before the demo — output is committed to the repo
+1. User uploads their resume (PDF or .txt) on the frontend
+2. Frontend `POST`s the file to `http://localhost:8000/analyze`
+3. Backend LLM pipeline parses the resume, infers job family, and scores all 24K H-1B employers → returns top N companies
+4. Frontend takes the `companyName` list and calls JSearch API to fetch active job listings at those companies
+5. Frontend renders each listing with the sponsorship score badge attached
 
-Prompt to use with Claude:
-> "Write a Python script that downloads the DOL H1B LCA disclosure data CSV, filters for CS/IT job titles, and outputs a JSON of top 500 companies with name, total LCA count, approval rate, and average salary."
+---
+
+## Backend API (Person 1 — running)
+
+Start the server: `cd resume_matcher && python api.py`
+
+### `GET /health`
+Returns `{ "status": "ok", "employers_loaded": 24362 }` — use this to confirm the server is up.
+
+### `POST /analyze`
+**Form fields:**
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `resume` | file | required | .pdf or .txt resume |
+| `top` | int | 10 | max companies to return |
+| `state` | string | "" | optional state filter e.g. "CA" |
+
+**Response shape:**
+```json
+{
+  "recommendations": [
+    {
+      "companyName": "Google LLC",
+      "scoreDisplay": 87,
+      "score": 0.87,
+      "reasons": ["Large H-1B sponsor (10,000+ approvals)", "Strong industry match: software"],
+      "matchedSectors": ["software", "ai_ml"],
+      "matchedRoles": ["software engineer", "machine learning"],
+      "h1bSignal": { "totalApprovals": 10432, "year": "2026" }
+    }
+  ],
+  "candidate": { "candidateName": "...", "jobTitles": ["..."], "skills": ["..."], ... },
+  "classification": { "job_family": "Software Engineer", "sector": "Technology", ... },
+  "ingestion": { "quality_score": 0.95, "word_count": 412, ... }
+}
+```
+
+**Key fields for the frontend:**
+- `companyName` — use this to query JSearch
+- `scoreDisplay` — 0–100, use for color-coded badge (≥75 green, 40–74 yellow, <40 red)
+- `h1bSignal.totalApprovals` — show as "X H-1B approvals" on the card
+
+**JavaScript fetch example:**
+```js
+const form = new FormData()
+form.append("resume", fileInput.files[0])
+form.append("top", "10")
+const res = await fetch("http://localhost:8000/analyze", { method: "POST", body: form })
+const { recommendations } = await res.json()
+```
 
 ---
 
 ## Frontend (Person 2)
 
-- Single search bar: user types a job title (e.g. "Software Engineer Intern")
-- Results: company cards ranked by sponsorship score
-- Each card shows: company name, score badge (color-coded), LCA count, avg salary, E-Verify badge
-- Start with hardcoded dummy data (2–3 companies using the shared shape above)
-- Swap in real `companies.json` once Person 1 is done
+- Resume upload UI (file input, drag-and-drop optional)
+- While loading: spinner (LLM call takes ~5–10s)
+- Results: job listing cards, each showing job title, company, location, apply link
+- Each card gets a sponsorship score badge from our API (`scoreDisplay` + color coding)
+- Score color coding: ≥75 green, 40–74 yellow, <40 red
+- Start with hardcoded dummy data matching the response shape above; swap in real API call when backend is confirmed running
 
 ---
 
 ## Integrations (Person 3)
 
-- **JSearch hook:** takes the user's job title query, hits JSearch API (RapidAPI free Basic plan), returns real job listings from Google for Jobs. Cross-references `employer_name` against `companies.json` to inject sponsorship data. Use fuzzy/partial string matching (e.g. `fuse.js` or simple `.includes()`) since JSearch employer names from job boards may vary slightly from DOL LCA canonical names.
-- **Note:** Free Basic plan allows 500 requests/month — plenty for a hackathon demo.
-- **E-Verify filter toggle:** a UI toggle that filters results to only `everify: true` companies — this is the "wow factor" differentiator vs myvisajobs
+- **JSearch hook:** after `/analyze` returns `recommendations[]`, call JSearch for each `companyName` to fetch active listings. Query format: `"{jobTitle} at {companyName}"`. Use simple `.toLowerCase().includes()` for fuzzy name matching since JSearch employer names may vary slightly.
+- **Note:** Free Basic plan allows 500 requests/month — batch queries or limit to top 5 companies to stay within quota.
+- **E-Verify filter toggle:** our API does not include `everify` data. Either skip this feature or cross-reference the USCIS E-Verify employer list separately.
 
 ---
 
