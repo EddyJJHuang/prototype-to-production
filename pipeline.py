@@ -4,7 +4,7 @@ Orchestrates the full resume → company recommendation pipeline.
 
 from typing import Optional
 
-from h1b_matcher import load_h1b_csv, recommend_companies
+from h1b_matcher import load_employers, recommend_companies
 from job_classifier import classify_job
 from resume_parser import parse_resume
 from schemas import JobClassification, RecommendedCompany, ResumeData
@@ -12,7 +12,7 @@ from schemas import JobClassification, RecommendedCompany, ResumeData
 
 def run_pipeline(
     resume_text: str,
-    h1b_csv_path: str,
+    h1b_data_path: str,
     top_n: int = 10,
     state_filter: Optional[str] = None,
 ) -> dict:
@@ -30,7 +30,7 @@ def run_pipeline(
     print(f"          → SOC keywords: {classification.soc_keywords}")
 
     print("Step 3/3  Scoring H-1B employers...")
-    df = load_h1b_csv(h1b_csv_path)
+    df = load_employers(h1b_data_path)
     print(f"          → Loaded {len(df):,} rows from CSV")
     recommendations: list[RecommendedCompany] = recommend_companies(
         df,

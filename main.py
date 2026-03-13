@@ -3,8 +3,9 @@
 CLI entry point for the resume → H-1B company matcher.
 
 Usage:
-    python main.py --resume path/to/resume.txt --csv path/to/h1b.csv
-    python main.py --resume resume.txt --csv h1b.csv --top 15 --state CA
+    python main.py --resume path/to/resume.txt --data companies.json
+    python main.py --resume resume.txt --data companies.json --top 15 --state CA
+    python main.py --resume resume.txt --data h1b.csv --top 15 --state CA
 """
 
 import argparse
@@ -22,7 +23,7 @@ def main():
         description="Match a resume to H-1B sponsoring companies."
     )
     parser.add_argument("--resume", required=True, help="Path to resume text file (.txt)")
-    parser.add_argument("--csv",    required=True, help="Path to H-1B employers CSV file")
+    parser.add_argument("--data",   required=True, help="Path to H-1B employers file (.json or .csv)")
     parser.add_argument("--top",    type=int, default=10, help="Number of companies to return (default: 10)")
     parser.add_argument("--state",  default=None, help="Optional: filter by US state abbreviation (e.g. CA, NY)")
     parser.add_argument("--json",   action="store_true", help="Output results as JSON instead of pretty-print")
@@ -44,7 +45,7 @@ def main():
     print("\n=== Resume → H-1B Company Matcher ===\n")
     result = run_pipeline(
         resume_text=resume_text,
-        h1b_csv_path=args.csv,
+        h1b_data_path=args.data,
         top_n=args.top,
         state_filter=args.state,
     )

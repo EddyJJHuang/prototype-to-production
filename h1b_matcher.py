@@ -1,12 +1,14 @@
 """
-Step 3+4: Load the H-1B CSV, aggregate by employer, and score each employer
+Step 3+4: Load H-1B employer data, aggregate by employer, and score each employer
 against the candidate's resume profile.
 
-Expected CSV columns (flexible naming, detected automatically):
-    employer_name, initial_approvals, continuing_approvals, total_approvals,
-    city, state, industry, year
+Supported file formats (auto-detected by extension):
+  .json  — companies.json from the repo (USCIS FY2026, one row per employer)
+             Fields: name, naics, city, state, fiscal_year, total_approvals, ...
+  .csv   — any H-1B CSV with flexible column naming (detected automatically)
+             Common fields: employer_name, total_approvals, city, state, industry, year
 
-All recommendations come exclusively from rows in the CSV — no hallucination possible.
+All recommendations come exclusively from rows in the file — no hallucination possible.
 """
 
 import math
@@ -107,9 +109,27 @@ def _find_col(df: pd.DataFrame, key: str) -> Optional[str]:
 
 # ── Data loading & aggregation ───────────────────────────────────────────────
 
-def load_h1b_csv(csv_path: str) -> pd.DataFrame:
-    df = pd.read_csv(csv_path, low_memory=False)
-    df.columns = df.columns.str.strip()
+# JSON field → standard internal column name
+_JSON_RENAME = {
+    "name":              "employer_name",
+    "naics":             "industry",
+    "fiscal_year":       "year",
+    "new_emp_approvals": "initial_approvals",
+    "cont_approvals":    "continuing_approvals",
+}
+
+
+def load_employers(path: str) -> pd.DataFrame:
+    """
+    Load H-1B employer data from a JSON or CSV file.
+    Normalizes column names so the rest of the pipeline is format-agnostic.
+    """
+    if path.lower().endswith(".json"):
+        df = pd.read_json(path)
+        df = df.rename(columns=_JSON_RENAME)
+    else:
+        df = pd.read_csv(path, low_memory=False)
+        df.columns = df.columns.str.strip()
     return df
 
 
