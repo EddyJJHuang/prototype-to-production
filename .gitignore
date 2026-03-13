@@ -1,6 +1,8 @@
 # Environment
 .env
 *.env
+*.env.local
+.env.local
 
 # Python
 __pycache__/
@@ -9,11 +11,15 @@ __pycache__/
 *.pyd
 .Python
 *.egg-info/
-dist/
 build/
 .venv/
 venv/
 env/
+
+# Node & Vite
+node_modules/
+dist/
+dist-ssr/
 
 # Data files (don't commit potentially large/sensitive CSVs)
 *.csv

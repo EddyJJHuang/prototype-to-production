@@ -1,22 +1,19 @@
-export interface Job {
-  id: string;
-  companyId: string;
-  companyName: string;
-  companyLogo: string;
-  title: string;
-  location: string;
-  salaryRange: string;
-  sponsorship: boolean;
-  greencardSupport: boolean;
-  matchScore: number;
-  postedDate: string;
-  description: string;
-  requirements: string[];
-  matchReasons: string[];
-  experienceLevel: string;
-  industry: string;
-}
-
+/**
+ * Company schema:
+ * {
+ *   id: string,
+ *   name: string,
+ *   logo: string,
+ *   industry: string,
+ *   petitions: number,
+ *   approvalRate: number,
+ *   avgSalary: number,
+ *   trend: 'up' | 'down' | 'flat',
+ *   topRoles: string[],
+ *   locations: string[],
+ *   history: { year: string; petitions: number }[]
+ * }
+ */
 export interface Company {
   id: string;
   name: string;
@@ -31,18 +28,7 @@ export interface Company {
   history: { year: string; petitions: number }[];
 }
 
-export interface Alumni {
-  id: string;
-  name: string;
-  initials: string;
-  university: string;
-  company: string;
-  role: string;
-  gradYear: string;
-  sponsors: boolean;
-}
-
-const companies: Company[] = [
+export const mockCompanies: Company[] = [
   {
     id: 'c1', name: 'Google', logo: 'https://logo.clearbit.com/google.com', industry: 'Technology',
     petitions: 24512, approvalRate: 99.1, avgSalary: 192500, trend: 'up',
@@ -164,159 +150,3 @@ const companies: Company[] = [
     history: [{ year: '2023', petitions: 400 }, { year: '2024', petitions: 480 }, { year: '2025', petitions: 550 }]
   }
 ];
-
-const generateJobs = (): Job[] => {
-  const jobs: Job[] = [];
-  const roles = ['Software Engineer', 'Backend Engineer', 'Frontend Engineer', 'Full Stack Developer', 'Machine Learning Engineer', 'Data Scientist', 'Product Manager', 'DevOps Engineer', 'Security Engineer', 'Data Engineer'];
-  const levels = ['Intern', 'Entry Level', 'Mid Level', 'Senior', 'Staff', 'Principal'];
-  const locations = ['San Francisco, CA', 'New York, NY', 'Seattle, WA', 'Austin, TX', 'Remote', 'Mountain View, CA', 'Menlo Park, CA', 'Redmond, WA'];
-  
-  for (let i = 1; i <= 35; i++) {
-    const company = companies[Math.floor(Math.random() * companies.length)];
-    const role = roles[Math.floor(Math.random() * roles.length)];
-    const level = levels[Math.floor(Math.random() * levels.length)];
-    const location = locations[Math.floor(Math.random() * locations.length)];
-    const isRemote = Math.random() > 0.7 || location === 'Remote';
-    const locString = isRemote && location !== 'Remote' ? `${location} (Remote)` : location;
-    const baseSalary = 100000 + Math.floor(Math.random() * 100000);
-    const maxSalary = baseSalary + 30000 + Math.floor(Math.random() * 50000);
-    const sponsorship = Math.random() > 0.15; // 85% sponsor
-    
-    jobs.push({
-      id: `j${i}`,
-      companyId: company.id,
-      companyName: company.name,
-      companyLogo: company.logo,
-      title: `${level === 'Entry Level' || level === 'Intern' ? '' : level} ${role}`.trim(),
-      location: locString,
-      salaryRange: `$${Math.floor(baseSalary/1000)}k - $${Math.floor(maxSalary/1000)}k`,
-      sponsorship: sponsorship,
-      greencardSupport: sponsorship && Math.random() > 0.3,
-      matchScore: Math.floor(Math.random() * 40) + 60, // 60-99
-      postedDate: `${Math.floor(Math.random() * 14) + 1}d ago`,
-      description: `${company.name} is looking for a talented ${role} to join our team. You will be responsible for building highly scalable systems and working on cutting-edge technologies. We value diversity and are committed to creating an inclusive environment for all employees.`,
-      requirements: [
-        `${level === 'Senior' || level === 'Staff' ? '5+' : level === 'Mid Level' ? '3+' : '0-2'} years of experience in software development`,
-        `Proficiency in ${['Python, Java, or C++', 'React, TypeScript, and Node.js', 'Go, Rust, or C++', 'SQL, Python, and Spark'][Math.floor(Math.random() * 4)]}`,
-        'Experience with large-scale distributed systems',
-        "Bachelor's or Master's degree in Computer Science or related field"
-      ],
-      matchReasons: [
-        `Your experience with ${['Python', 'React', 'Distributed Systems', 'Machine Learning'][Math.floor(Math.random() * 4)]} aligns perfectly with the role.`,
-        `Your background in ${company.industry} makes you a strong candidate.`,
-        `Company history shows frequent H-1B transfers for your profile.`
-      ],
-      experienceLevel: level,
-      industry: company.industry
-    });
-  }
-  
-  // Ensure some specific jobs exist for the dashboard/resume match
-  jobs[0] = {
-    ...jobs[0],
-    id: 'j_google_cloud',
-    companyId: 'c1',
-    companyName: 'Google',
-    companyLogo: 'https://logo.clearbit.com/google.com',
-    title: 'Senior Software Engineer, Cloud',
-    location: 'Mountain View, CA (Remote)',
-    salaryRange: '$180k - $260k',
-    sponsorship: true,
-    greencardSupport: true,
-    matchScore: 98,
-    postedDate: '2 hours ago',
-    experienceLevel: 'Senior',
-    industry: 'Technology',
-    matchReasons: [
-      'Expertise in Go: Your profile shows 5+ years of production experience.',
-      'Cloud Infrastructure: Matches your recent projects at Amazon Web Services.',
-      'Visa Requirements: Company history shows frequent O-1 transfers for your profile.'
-    ]
-  };
-  
-  jobs[1] = {
-    ...jobs[1],
-    id: 'j_stripe_design',
-    companyId: 'c5',
-    companyName: 'Stripe',
-    companyLogo: 'https://logo.clearbit.com/stripe.com',
-    title: 'Staff Product Designer',
-    location: 'San Francisco, CA',
-    salaryRange: '$160k - $240k',
-    sponsorship: true,
-    greencardSupport: true,
-    matchScore: 92,
-    postedDate: '5 hours ago',
-    experienceLevel: 'Staff',
-    industry: 'Finance'
-  };
-  
-  jobs[2] = {
-    ...jobs[2],
-    id: 'j_airbnb_data',
-    companyId: 'c11',
-    companyName: 'Airbnb',
-    companyLogo: 'https://logo.clearbit.com/airbnb.com',
-    title: 'Data Scientist, Analytics',
-    location: 'Seattle, WA',
-    salaryRange: '$150k - $210k',
-    sponsorship: true,
-    greencardSupport: false,
-    matchScore: 85,
-    postedDate: '1 day ago',
-    experienceLevel: 'Mid Level',
-    industry: 'Travel'
-  };
-  
-  jobs[3] = {
-    ...jobs[3],
-    id: 'j_datadog_backend',
-    companyId: 'c6', // Using databricks logo for datadog as fallback
-    companyName: 'Datadog',
-    companyLogo: 'https://logo.clearbit.com/datadog.com',
-    title: 'Backend Engineer (Go)',
-    location: 'New York, NY',
-    salaryRange: '$140k - $200k',
-    sponsorship: true,
-    greencardSupport: true,
-    matchScore: 81,
-    postedDate: '2 days ago',
-    experienceLevel: 'Mid Level',
-    industry: 'Technology'
-  };
-
-  return jobs;
-};
-
-const alumni: Alumni[] = [
-  { id: 'a1', name: 'J. Chen', initials: 'JC', university: 'Carnegie Mellon University', company: 'Google', role: 'Software Engineer', gradYear: '2022', sponsors: true },
-  { id: 'a2', name: 'A. Patel', initials: 'AP', university: 'Georgia Tech', company: 'Meta', role: 'Data Scientist', gradYear: '2021', sponsors: true },
-  { id: 'a3', name: 'S. Kim', initials: 'SK', university: 'UC Berkeley', company: 'Stripe', role: 'Frontend Engineer', gradYear: '2023', sponsors: true },
-  { id: 'a4', name: 'M. Garcia', initials: 'MG', university: 'MIT', company: 'Amazon', role: 'Applied Scientist', gradYear: '2020', sponsors: true },
-  { id: 'a5', name: 'R. Sharma', initials: 'RS', university: 'Stanford University', company: 'Databricks', role: 'Backend Engineer', gradYear: '2022', sponsors: true },
-  { id: 'a6', name: 'L. Wang', initials: 'LW', university: 'University of Washington', company: 'Microsoft', role: 'Product Manager', gradYear: '2021', sponsors: true },
-  { id: 'a7', name: 'D. Nguyen', initials: 'DN', university: 'UT Austin', company: 'Coinbase', role: 'Security Engineer', gradYear: '2023', sponsors: true },
-  { id: 'a8', name: 'K. Tanaka', initials: 'KT', university: 'UCLA', company: 'Apple', role: 'Hardware Engineer', gradYear: '2019', sponsors: true },
-  { id: 'a9', name: 'P. Singh', initials: 'PS', university: 'UIUC', company: 'Netflix', role: 'Senior Software Engineer', gradYear: '2018', sponsors: true },
-  { id: 'a10', name: 'Y. Zhang', initials: 'YZ', university: 'Cornell University', company: 'Airbnb', role: 'Data Engineer', gradYear: '2022', sponsors: true },
-  { id: 'a11', name: 'H. Lee', initials: 'HL', university: 'University of Michigan', company: 'Uber', role: 'Machine Learning Engineer', gradYear: '2021', sponsors: true },
-  { id: 'a12', name: 'T. Rahman', initials: 'TR', university: 'Purdue University', company: 'DoorDash', role: 'Software Engineer', gradYear: '2023', sponsors: true },
-  { id: 'a13', name: 'E. Silva', initials: 'ES', university: 'USC', company: 'Snowflake', role: 'Solutions Architect', gradYear: '2020', sponsors: true },
-  { id: 'a14', name: 'V. Kumar', initials: 'VK', university: 'NYU', company: 'Palantir', role: 'Forward Deployed Engineer', gradYear: '2022', sponsors: true },
-  { id: 'a15', name: 'C. Wu', initials: 'CW', university: 'Columbia University', company: 'Robinhood', role: 'Software Engineer', gradYear: '2021', sponsors: true },
-];
-
-export const mockData = {
-  companies,
-  jobs: generateJobs(),
-  alumni,
-  user: {
-    name: 'Alex Johnson',
-    email: 'alex.j@example.com',
-    university: 'Stanford University',
-    gradYear: '2024',
-    visaStatus: 'F-1 OPT',
-    avatar: 'https://i.pravatar.cc/150?u=alex',
-    plan: 'Premium Plan'
-  }
-};
