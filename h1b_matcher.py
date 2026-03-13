@@ -400,6 +400,7 @@ def recommend_companies(
         results.append(
             RecommendedCompany(
                 companyName=name,
+                sector=classification.sector,
                 score=round(composite, 4),
                 reasons=reasons,
                 matchedSectors=matched_sectors,

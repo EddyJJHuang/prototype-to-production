@@ -77,6 +77,7 @@ class H1bSignal(BaseModel):
 
 class RecommendedCompany(BaseModel):
     companyName: str
+    sector: str               # primary sector for JSearch query
     score: float              # 0.0 – 1.0, weighted composite
     reasons: list[str]        # human-readable explanation of each score component
     matchedSectors: list[str] # candidate sectors that matched this employer's industry
