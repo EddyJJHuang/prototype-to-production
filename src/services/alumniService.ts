@@ -2,7 +2,7 @@ import api from './api';
 import { mockAlumni, Alumni } from '../data/mockAlumni';
 import { API_ENDPOINTS } from '../utils/constants';
 
-const USE_MOCK = import.meta.env.VITE_USE_MOCK_DATA === 'true';
+const USE_MOCK = true; // import.meta.env.VITE_USE_MOCK_DATA === 'true';
 
 export const getAlumni = async (filters: any = {}): Promise<Alumni[]> => {
   if (USE_MOCK) {

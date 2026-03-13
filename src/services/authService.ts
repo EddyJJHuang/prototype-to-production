@@ -2,7 +2,7 @@ import api from './api';
 import { mockUser, User } from '../data/mockUser';
 import { API_ENDPOINTS } from '../utils/constants';
 
-const USE_MOCK = import.meta.env.VITE_USE_MOCK_DATA === 'true';
+const USE_MOCK = true; // import.meta.env.VITE_USE_MOCK_DATA === 'true';
 
 export const login = async (credentials: any): Promise<{ user: User, token: string }> => {
   if (USE_MOCK) {

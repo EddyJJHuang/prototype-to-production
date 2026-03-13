@@ -3,7 +3,7 @@ import { uploadResume } from '../../services/resumeService';
 import { UploadCloud, FileText, CheckCircle } from 'lucide-react';
 
 interface ResumeUploadProps {
-  onSuccess: () => void;
+  onSuccess: (data: any) => void;
 }
 
 const ResumeUpload: React.FC<ResumeUploadProps> = ({ onSuccess }) => {
@@ -50,10 +50,11 @@ const ResumeUpload: React.FC<ResumeUploadProps> = ({ onSuccess }) => {
     setIsUploading(true);
     
     try {
-      await uploadResume(file);
-      onSuccess();
+      const data = await uploadResume(file);
+      onSuccess(data);
     } catch (err) {
       setError('Upload failed. Please try again.');
+      console.error(err);
     } finally {
       setIsUploading(false);
     }

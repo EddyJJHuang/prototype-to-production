@@ -2,7 +2,7 @@ import api from './api';
 import { mockCompanies, Company } from '../data/mockCompanies';
 import { API_ENDPOINTS } from '../utils/constants';
 
-const USE_MOCK = import.meta.env.VITE_USE_MOCK_DATA === 'true';
+const USE_MOCK = true; // import.meta.env.VITE_USE_MOCK_DATA === 'true';
 
 export const getCompanies = async (filters: any = {}): Promise<Company[]> => {
   if (USE_MOCK) {

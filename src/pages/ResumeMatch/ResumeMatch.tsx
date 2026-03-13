@@ -5,7 +5,7 @@ import ResumeResults from './ResumeResults';
 import { motion } from 'motion/react';
 
 const ResumeMatch: React.FC = () => {
-  const { resumeUploaded, setResumeUploaded } = useContext(ResumeContext) || {};
+  const { resumeUploaded, setResumeUploaded, setResumeData } = useContext(ResumeContext) || {};
 
   return (
     <motion.div 
@@ -21,7 +21,12 @@ const ResumeMatch: React.FC = () => {
       {resumeUploaded ? (
         <ResumeResults />
       ) : (
-        <ResumeUpload onSuccess={() => setResumeUploaded?.(true)} />
+        <ResumeUpload 
+          onSuccess={(data) => {
+            setResumeData?.(data);
+            setResumeUploaded?.(true);
+          }} 
+        />
       )}
     </motion.div>
   );

@@ -4,7 +4,7 @@ export const API_ENDPOINTS = {
   COMPANIES: '/companies',
   COMPANY_DETAIL: (id: string) => `/companies/${id}`,
   COMPANY_STATS: '/companies/stats',
-  RESUME_UPLOAD: '/resume/upload',
+  RESUME_UPLOAD: '/analyze',
   RESUME_MATCH: '/resume/match',
   ALUMNI: '/alumni',
   USER_PROFILE: '/user/profile',

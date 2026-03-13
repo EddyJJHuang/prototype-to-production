@@ -2,7 +2,7 @@ import api from './api';
 import { mockJobs, Job } from '../data/mockJobs';
 import { API_ENDPOINTS } from '../utils/constants';
 
-const USE_MOCK = import.meta.env.VITE_USE_MOCK_DATA === 'true';
+const USE_MOCK = true; // Forced mock since api.py doesn't expose /jobs yet // import.meta.env.VITE_USE_MOCK_DATA === 'true';
 
 export const getJobs = async (filters: any = {}): Promise<{ data: Job[], total: number }> => {
   if (USE_MOCK) {
