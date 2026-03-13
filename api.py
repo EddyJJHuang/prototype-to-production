@@ -44,7 +44,7 @@ from resume_parser import parse_resume
 # ── Config ────────────────────────────────────────────────────────────────────
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
-_DEFAULT_DATA = os.path.join(_HERE, "..", "companies.json")
+_DEFAULT_DATA = os.path.join(_HERE, "companies.json")
 _DATA_PATH = os.environ.get("H1B_DATA_PATH", _DEFAULT_DATA)
 
 # ── Startup: load employer data once ─────────────────────────────────────────

@@ -1,0 +1,21 @@
+INFO:     Will watch for changes in these directories: ['/Users/eddyhuang/Downloads/prototype-to-production']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [19605] using WatchFiles
+INFO:     Started server process [19607]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+  Loading employer data from /Users/eddyhuang/Downloads/prototype-to-production/companies.json ...
+  Ready — 24,362 employers loaded.
+INFO:     127.0.0.1:52738 - "POST /analyze HTTP/1.1" 200 OK
+WARNING:  WatchFiles detected changes in 'llm.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [19607]
+INFO:     Started server process [19666]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+  Loading employer data from /Users/eddyhuang/Downloads/prototype-to-production/companies.json ...
+  Ready — 24,362 employers loaded.
+INFO:     127.0.0.1:52799 - "POST /analyze HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52814 - "POST /analyze HTTP/1.1" 200 OK

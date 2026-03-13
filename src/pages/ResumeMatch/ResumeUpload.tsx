@@ -37,8 +37,8 @@ const ResumeUpload: React.FC<ResumeUploadProps> = ({ onSuccess }) => {
 
   const processFile = async (file: File) => {
     // Basic validation
-    if (file.type !== 'application/pdf' && !file.type.includes('wordprocessingml')) {
-      setError('Please upload a PDF or DOCX file.');
+    if (file.type !== 'application/pdf' && !file.type.includes('wordprocessingml') && file.type !== 'text/plain') {
+      setError('Please upload a PDF, DOCX, or TXT file.');
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
@@ -84,7 +84,7 @@ const ResumeUpload: React.FC<ResumeUploadProps> = ({ onSuccess }) => {
           type="file" 
           id="resume-upload" 
           className="hidden" 
-          accept=".pdf,.doc,.docx" 
+          accept=".pdf,.doc,.docx,.txt" 
           onChange={handleChange}
           disabled={isUploading}
         />
@@ -104,7 +104,7 @@ const ResumeUpload: React.FC<ResumeUploadProps> = ({ onSuccess }) => {
               Click to upload or drag and drop
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-              PDF, DOCX (Max 5MB)
+              PDF, DOCX, TXT (Max 5MB)
             </p>
             <span className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
               Select File
