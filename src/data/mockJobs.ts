@@ -38,6 +38,8 @@ export interface Job {
   matchReasons: string[];
   experienceLevel: string;
   industry: string;
+  applyLink?: string;
+  isRemote?: boolean;
 }
 
 const generateJobs = (): Job[] => {

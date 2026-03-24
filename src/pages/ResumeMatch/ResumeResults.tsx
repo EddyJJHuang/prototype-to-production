@@ -5,7 +5,7 @@ import { SavedJobsContext } from '../../context/SavedJobsContext';
 import { ResumeContext } from '../../context/ResumeContext';
 import JobCard from '../../components/common/JobCard';
 import Loader from '../../components/common/Loader';
-import { Trash2, FileCheck } from 'lucide-react';
+import { Trash2, FileCheck, Briefcase, GraduationCap, Sparkles } from 'lucide-react';
 import { motion } from 'motion/react';
 
 const ResumeResults: React.FC = () => {
@@ -14,46 +14,38 @@ const ResumeResults: React.FC = () => {
   const { setResumeUploaded, resumeData, setResumeData } = useContext(ResumeContext) || { setResumeUploaded: () => {} };
   const { savedJobs, toggleSavedJob } = useContext(SavedJobsContext) || { savedJobs: [], toggleSavedJob: () => {} };
 
+  // Extract classification info from resume analysis
+  const jobTitle = resumeData?.classification?.job_family_label || 'Software Engineer';
+  const seniorityLevel = resumeData?.classification?.seniority_level || '';
+  const skills = resumeData?.candidate?.skills || [];
+  const topSkills = Array.isArray(skills) ? skills.slice(0, 5) : [];
+
   useEffect(() => {
-    const fetchMatches = async () => {
-      if (resumeData && resumeData.recommendations) {
-        setLoading(true);
-        const parsedJobs: Job[] = resumeData.recommendations.map((rec: any, idx: number) => ({
-          id: `api-job-${idx}`,
-          companyId: `api-comp-${idx}`,
-          companyName: rec.employer_name || rec.name || 'Unknown',
-          companyLogo: '',
-          title: resumeData.classification?.job_family_label || 'Software Engineer',
-          location: 'United States',
-          salaryRange: rec.avg_salary ? `$${Math.floor(rec.avg_salary / 1000)}k+` : 'Varies',
-          sponsorship: true,
-          greencardSupport: false,
-          matchScore: rec.scoreDisplay || Math.round((rec.score || 0) * 100),
-          postedDate: 'Recently',
-          description: `You stand a strong chance here because: ${rec.reasons?.join(' ')}`,
-          requirements: ['H-1B Visa sponsorship tracked actively in the current season.'],
-          matchReasons: rec.reasons || [],
-          experienceLevel: resumeData.classification?.seniority_level || 'Professional',
-          industry: rec.industry || 'Technology'
-        }));
-        setJobs(parsedJobs);
-        setLoading(false);
-      } else {
+    const fetchRealJobs = async () => {
+      setLoading(true);
+      try {
+        // Build a search query from resume analysis data
+        const searchQuery = seniorityLevel 
+          ? `${seniorityLevel} ${jobTitle}` 
+          : jobTitle;
+        
+        const res = await getJobs({ q: searchQuery, page: 1 });
+        setJobs(res.data.slice(0, 9)); // Show top 9 matches
+      } catch (err) {
+        console.error("Failed to fetch matched jobs from JSearch", err);
+        // Fallback: try a simpler query
         try {
-          const res = await getJobs();
-          const matches = [...res.data]
-            .sort((a, b) => b.matchScore - a.matchScore)
-            .slice(0, 9);
-          setJobs(matches);
-        } catch (err) {
-          console.error("Failed to fetch match results", err);
-        } finally {
-          setLoading(false);
+          const fallback = await getJobs({ q: jobTitle });
+          setJobs(fallback.data.slice(0, 9));
+        } catch (fallbackErr) {
+          console.error("Fallback search also failed", fallbackErr);
         }
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchMatches();
+    fetchRealJobs();
   }, [resumeData]);
 
   const handleReset = () => {
@@ -73,14 +65,15 @@ const ResumeResults: React.FC = () => {
       animate={{ opacity: 1 }}
       className="max-w-7xl mx-auto"
     >
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4 bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+      {/* Header with analysis summary */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
             <FileCheck className="w-6 h-6 text-green-500 mr-2" />
             Looking good! Here's what we found.
           </h2>
           <p className="text-gray-500 dark:text-gray-400 mt-1">
-            We extracted your skills and matched them against active H-1B sponsors.
+            We analyzed your resume and found real job openings that match your profile.
           </p>
         </div>
         
@@ -93,13 +86,58 @@ const ResumeResults: React.FC = () => {
         </button>
       </div>
 
+      {/* Resume Analysis Summary Card */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 flex items-center space-x-3">
+          <div className="p-2.5 bg-blue-100 dark:bg-blue-900/40 rounded-lg">
+            <Briefcase className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          </div>
+          <div>
+            <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">Detected Role</p>
+            <p className="text-sm font-bold text-gray-900 dark:text-white">{jobTitle}</p>
+          </div>
+        </div>
+
+        {seniorityLevel && (
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 flex items-center space-x-3">
+            <div className="p-2.5 bg-purple-100 dark:bg-purple-900/40 rounded-lg">
+              <GraduationCap className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">Seniority Level</p>
+              <p className="text-sm font-bold text-gray-900 dark:text-white">{seniorityLevel}</p>
+            </div>
+          </div>
+        )}
+
+        {topSkills.length > 0 && (
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 flex items-center space-x-3">
+            <div className="p-2.5 bg-green-100 dark:bg-green-900/40 rounded-lg">
+              <Sparkles className="w-5 h-5 text-green-600 dark:text-green-400" />
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">Top Skills</p>
+              <p className="text-sm font-bold text-gray-900 dark:text-white truncate">
+                {topSkills.join(', ')}
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Jobs Section */}
       <div className="mb-6">
-        <h3 className="text-lg font-bold text-gray-900 dark:text-white">Top Sponsorship Matches</h3>
+        <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+          Top Job Matches for "{jobTitle}"
+        </h3>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          Real-time job listings from across the web, matched to your profile
+        </p>
       </div>
 
       {loading ? (
         <Loader type="card" count={6} />
-      ) : (
+      ) : jobs.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {jobs.map(job => (
             <JobCard 
@@ -109,6 +147,10 @@ const ResumeResults: React.FC = () => {
               onToggleSave={handleToggleSave}
             />
           ))}
+        </div>
+      ) : (
+        <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+          <p className="text-gray-500 dark:text-gray-400">No matching jobs found. Try uploading a different resume.</p>
         </div>
       )}
     </motion.div>

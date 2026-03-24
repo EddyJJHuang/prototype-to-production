@@ -47,9 +47,23 @@ const JobDetail: React.FC<JobDetailProps> = ({ job, onClose }) => {
                 <Bookmark className="h-5 w-5" />
               }
             </button>
-            <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 hover:brightness-110 active:scale-[0.98] text-white font-medium rounded-lg transition-all flex items-center justify-center">
-              Apply <ExternalLink className="ml-2 h-4 w-4" />
-            </button>
+            {job.applyLink ? (
+              <a 
+                href={job.applyLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 hover:brightness-110 active:scale-[0.98] text-white font-medium rounded-lg transition-all flex items-center justify-center"
+              >
+                Apply <ExternalLink className="ml-2 h-4 w-4" />
+              </a>
+            ) : (
+              <button 
+                disabled
+                className="px-4 py-2 bg-gray-400 text-white font-medium rounded-lg cursor-not-allowed flex items-center justify-center"
+              >
+                Apply <ExternalLink className="ml-2 h-4 w-4" />
+              </button>
+            )}
           </div>
         </div>
 
