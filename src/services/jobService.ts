@@ -6,7 +6,7 @@ const USE_MOCK = import.meta.env.VITE_USE_MOCK_DATA === 'true';
 
 export const getJobs = async (filters: any = {}): Promise<{ data: Job[], total: number }> => {
   if (USE_MOCK) {
-    await new Promise(resolve => setTimeout(resolve, 300));
+    // Return mock data immediately (no artificial delay)
     
     let results = [...mockJobs];
     
@@ -46,7 +46,7 @@ export const getJobs = async (filters: any = {}): Promise<{ data: Job[], total: 
 
 export const getJobById = async (id: string): Promise<Job | null> => {
   if (USE_MOCK) {
-    await new Promise(resolve => setTimeout(resolve, 200));
+    // Return mock data immediately (no artificial delay)
     return mockJobs.find(job => job.id === id) || null;
   }
   // For real API, we fetch all current results and find by id

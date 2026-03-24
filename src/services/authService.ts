@@ -6,7 +6,7 @@ const USE_MOCK = true; // import.meta.env.VITE_USE_MOCK_DATA === 'true';
 
 export const login = async (credentials: any): Promise<{ user: User, token: string }> => {
   if (USE_MOCK) {
-    await new Promise(r => setTimeout(r, 600));
+    // Return mock data immediately (no artificial delay)
     const token = 'mock_jwt_token_123';
     localStorage.setItem('visahire_token', token);
     return { user: mockUser, token };

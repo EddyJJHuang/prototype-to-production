@@ -11,6 +11,8 @@ const SponsorshipStats: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
+  const isInitialMount = React.useRef(true);
+
   useEffect(() => {
     const fetchCompanies = async () => {
       setLoading(true);
@@ -24,11 +26,16 @@ const SponsorshipStats: React.FC = () => {
       }
     };
     
-    const timer = setTimeout(() => {
+    // Fetch immediately on first mount, debounce subsequent changes
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
       fetchCompanies();
-    }, 300);
-
-    return () => clearTimeout(timer);
+    } else {
+      const timer = setTimeout(() => {
+        fetchCompanies();
+      }, 300);
+      return () => clearTimeout(timer);
+    }
   }, [searchQuery]);
 
   const renderTrendIcon = (trend: string) => {
@@ -76,7 +83,7 @@ const SponsorshipStats: React.FC = () => {
                 <tr>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Industry</th>
-                  <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Petitions (2025)</th>
+                  <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Petitions (FY2026)</th>
                   <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Approval Rate</th>
                   <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Avg Salary</th>
                   <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Trend</th>
@@ -89,7 +96,16 @@ const SponsorshipStats: React.FC = () => {
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10 border border-gray-100 dark:border-gray-700 rounded bg-white overflow-hidden flex items-center justify-center p-1">
                           {company.logo ? (
-                            <img className="h-full w-full object-contain" src={company.logo} alt={company.name} />
+                            <img
+                              className="h-full w-full object-contain"
+                              src={company.logo}
+                              alt={company.name}
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).style.display = 'none';
+                                (e.target as HTMLImageElement).parentElement?.classList.add('logo-fallback');
+                              }}
+                              referrerPolicy="no-referrer"
+                            />
                           ) : (
                             <Building2 className="h-5 w-5 text-gray-400" />
                           )}

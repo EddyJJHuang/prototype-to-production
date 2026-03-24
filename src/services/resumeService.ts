@@ -5,7 +5,7 @@ const USE_MOCK = import.meta.env.VITE_USE_MOCK_DATA === 'true';
 
 export const uploadResume = async (file: File): Promise<any> => {
   if (USE_MOCK) {
-    await new Promise(r => setTimeout(r, 1500)); // Simulate file parsing
+    // Return mock data immediately (no artificial delay)
     localStorage.setItem('visahire_resume_status_v2', JSON.stringify(true));
     return { success: true, matchAnalyzed: true };
   }

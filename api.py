@@ -90,6 +90,17 @@ _JSEARCH_KEY = os.environ.get("JSEARCH_API_KEY", "")
 _JSEARCH_HOST = os.environ.get("JSEARCH_API_HOST", "jsearch.p.rapidapi.com")
 _JSEARCH_URL = f"https://{_JSEARCH_HOST}/search"
 
+# ── Simple TTL cache for JSearch results ─────────────────────────────────────
+import time as _time
+
+_jsearch_cache: dict[str, tuple[float, dict]] = {}   # key → (expires_at, data)
+_CACHE_TTL = 300  # 5 minutes
+
+
+def _cache_key(**kwargs) -> str:
+    """Build a deterministic cache key from query parameters."""
+    return "|".join(f"{k}={v}" for k, v in sorted(kwargs.items()))
+
 
 @app.get("/jobs")
 async def search_jobs(
@@ -122,16 +133,26 @@ async def search_jobs(
         "country": country,
         "date_posted": date_posted,
     }
-    headers = {
-        "x-rapidapi-host": _JSEARCH_HOST,
-        "x-rapidapi-key": _JSEARCH_KEY,
-        "Content-Type": "application/json",
-    }
 
-    async with httpx.AsyncClient(timeout=30) as client:
-        resp = await client.get(_JSEARCH_URL, params=params, headers=headers)
-        resp.raise_for_status()
-        raw = resp.json()
+    # ── Check cache first ─────────────────────────────────────────────────
+    ck = _cache_key(**params)
+    cached = _jsearch_cache.get(ck)
+    if cached and cached[0] > _time.time():
+        raw = cached[1]
+    else:
+        headers = {
+            "x-rapidapi-host": _JSEARCH_HOST,
+            "x-rapidapi-key": _JSEARCH_KEY,
+            "Content-Type": "application/json",
+        }
+
+        async with httpx.AsyncClient(timeout=30) as client:
+            resp = await client.get(_JSEARCH_URL, params=params, headers=headers)
+            resp.raise_for_status()
+            raw = resp.json()
+
+        # Store in cache
+        _jsearch_cache[ck] = (_time.time() + _CACHE_TTL, raw)
 
     # Map JSearch response to the frontend Job interface
     jobs = []

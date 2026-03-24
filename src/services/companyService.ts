@@ -6,7 +6,7 @@ const USE_MOCK = true; // import.meta.env.VITE_USE_MOCK_DATA === 'true';
 
 export const getCompanies = async (filters: any = {}): Promise<Company[]> => {
   if (USE_MOCK) {
-    await new Promise(r => setTimeout(r, 400));
+    // Return mock data immediately (no artificial delay)
     let results = [...mockCompanies];
     if (filters.q) {
       const q = filters.q.toLowerCase();
@@ -20,7 +20,7 @@ export const getCompanies = async (filters: any = {}): Promise<Company[]> => {
 
 export const getCompanyById = async (id: string): Promise<Company | null> => {
   if (USE_MOCK) {
-    await new Promise(r => setTimeout(r, 200));
+    // Return mock data immediately (no artificial delay)
     return mockCompanies.find(c => c.id === id) || null;
   }
   const res = await api.get(API_ENDPOINTS.COMPANY_DETAIL(id));

@@ -14,6 +14,8 @@ const Alumni: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [connecting, setConnecting] = useState<Record<string, boolean>>({});
 
+  const isInitialMount = React.useRef(true);
+
   useEffect(() => {
     const fetchAlumni = async () => {
       setLoading(true);
@@ -27,11 +29,16 @@ const Alumni: React.FC = () => {
       }
     };
 
-    const timer = setTimeout(() => {
+    // Fetch immediately on first mount, debounce subsequent changes
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
       fetchAlumni();
-    }, 300);
-
-    return () => clearTimeout(timer);
+    } else {
+      const timer = setTimeout(() => {
+        fetchAlumni();
+      }, 300);
+      return () => clearTimeout(timer);
+    }
   }, [searchQuery]);
 
   const handleConnect = (id: string, name: string) => {

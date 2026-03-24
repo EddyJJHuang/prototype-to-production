@@ -6,7 +6,7 @@ const USE_MOCK = true; // import.meta.env.VITE_USE_MOCK_DATA === 'true';
 
 export const getAlumni = async (filters: any = {}): Promise<Alumni[]> => {
   if (USE_MOCK) {
-    await new Promise(r => setTimeout(r, 300));
+    // Return mock data immediately (no artificial delay)
     let results = [...mockAlumni];
     if (filters.q) {
       const q = filters.q.toLowerCase();

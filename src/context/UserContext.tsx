@@ -12,13 +12,9 @@ export const UserContext = createContext<UserContextType | undefined>(undefined)
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   
-  // Simulate fetching user on load
+  // Load user data immediately (mock mode — no API call needed)
   useEffect(() => {
-    // In future this will be an API call verifying the token
-    const timer = setTimeout(() => {
-      setUser(mockUser);
-    }, 500);
-    return () => clearTimeout(timer);
+    setUser(mockUser);
   }, []);
 
   return (

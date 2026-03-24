@@ -27,6 +27,8 @@ const JobSearch: React.FC = () => {
   // Create a map for fast lookup in list
   const savedJobsMap = savedJobs.reduce((acc, id) => ({ ...acc, [id]: true }), {} as Record<string, boolean>);
 
+  const isInitialMount = React.useRef(true);
+
   useEffect(() => {
     const fetchJobs = async () => {
       setLoading(true);
@@ -49,12 +51,16 @@ const JobSearch: React.FC = () => {
       }
     };
 
-    // Debounce search
-    const timer = setTimeout(() => {
+    // Fetch immediately on first mount, debounce subsequent changes
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
       fetchJobs();
-    }, 300);
-
-    return () => clearTimeout(timer);
+    } else {
+      const timer = setTimeout(() => {
+        fetchJobs();
+      }, 300);
+      return () => clearTimeout(timer);
+    }
   }, [searchQuery, sponsorshipOnly]);
 
   const handleJobSelect = (id: string) => {
