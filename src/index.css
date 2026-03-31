@@ -1,6 +1,40 @@
 @import "tailwindcss";
 
 @theme {
+  /* ── Fonts ── */
+  --font-display: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* ── Semantic Colors ── */
+  --color-primary-50: #EEF2FF;
+  --color-primary-100: #E0E7FF;
+  --color-primary-600: #4F46E5;
+  --color-primary-700: #4338CA;
+  --color-primary-900: #312E81;
+
+  --color-sponsor-green: #059669;
+  --color-sponsor-green-bg: #D1FAE5;
+  --color-sponsor-green-border: #A7F3D0;
+
+  --color-sponsor-amber: #D97706;
+  --color-sponsor-amber-bg: #FEF3C7;
+  --color-sponsor-amber-border: #FDE68A;
+
+  --color-sponsor-gray: #6B7280;
+  --color-sponsor-gray-bg: #F3F4F6;
+  --color-sponsor-gray-border: #E5E7EB;
+
+  --color-match-high: #16A34A;
+  --color-match-mid: #D97706;
+  --color-match-low: #9CA3AF;
+
+  /* ── Surface (keep Tailwind defaults available too) ── */
+  --color-surface-page: #F8FAFC;
+  --color-surface-card: #FFFFFF;
+  --color-surface-hover: #F1F5F9;
+  --color-surface-selected: #EEF2FF;
+
   --color-green-100: #dcfce7;
   --color-green-300: #86efac;
   --color-green-600: #16a34a;
@@ -19,15 +53,26 @@
 
 @layer base {
   body {
-    background-color: var(--color-gray-50);
+    font-family: var(--font-body);
+    background-color: var(--color-surface-page);
     color: var(--color-gray-900);
     overflow: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
 }
 
-/* Custom scrollbar for webkit */
+/* ── Custom scrollbar ── */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -46,6 +91,7 @@
   background-color: var(--color-gray-400);
 }
 
+/* ── Dark mode ── */
 .dark body {
   background-color: var(--color-gray-900);
   color: var(--color-gray-100);
@@ -57,4 +103,19 @@
 
 .dark ::-webkit-scrollbar-thumb:hover {
   background-color: var(--color-gray-500);
+}
+
+/* ── Tabular nums for mono font ── */
+.font-mono {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

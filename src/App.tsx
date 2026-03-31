@@ -14,12 +14,17 @@ export default function App() {
           <ResumeProvider>
             <Router>
               <AppRoutes />
-              {/* Toaster uses sonner, customized for dark mode tracking */}
-              <Toaster 
-                position="top-right"
+              <Toaster
+                position="bottom-right"
+                gap={8}
                 toastOptions={{
-                  className: 'dark:bg-gray-800 dark:text-white dark:border-gray-700',
+                  duration: 3000,
+                  className: 'font-body text-sm',
+                  style: {
+                    fontFamily: "'DM Sans', system-ui, sans-serif",
+                  },
                 }}
+                theme="system"
               />
             </Router>
           </ResumeProvider>

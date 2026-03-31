@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileSearch } from 'lucide-react';
+import { SearchX } from 'lucide-react';
 
 interface EmptyStateProps {
   icon?: React.ReactNode;
@@ -9,20 +9,20 @@ interface EmptyStateProps {
   className?: string;
 }
 
-const EmptyState: React.FC<EmptyStateProps> = ({ 
-  icon, 
-  title, 
-  description, 
+const EmptyState = ({
+  icon,
+  title,
+  description,
   action,
   className = ''
-}) => {
+}: EmptyStateProps) => {
   return (
-    <div className={`flex flex-col items-center justify-center p-8 text-center bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-dashed border-gray-300 dark:border-gray-700 transition-colors duration-200 ${className}`}>
-      <div className="w-16 h-16 mb-4 flex items-center justify-center rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-500 dark:text-blue-400">
-        {icon || <FileSearch className="w-8 h-8" />}
+    <div className={`flex flex-col items-center justify-center p-10 text-center transition-colors duration-200 ${className}`}>
+      <div className="w-16 h-16 mb-5 flex items-center justify-center rounded-2xl bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500">
+        {icon || <SearchX className="w-7 h-7" strokeWidth={1.75} />}
       </div>
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{title}</h3>
-      <p className="text-sm text-gray-500 dark:text-gray-400 max-w-sm mb-6">{description}</p>
+      <h3 className="text-lg font-display font-bold text-gray-900 dark:text-white mb-2">{title}</h3>
+      <p className="text-sm font-body text-gray-500 dark:text-gray-400 max-w-xs mb-6 leading-relaxed">{description}</p>
       {action && <div>{action}</div>}
     </div>
   );
