@@ -24,6 +24,7 @@ Frontend usage (JavaScript fetch example):
     const data = await res.json()
 """
 
+import asyncio
 import os
 import tempfile
 from contextlib import asynccontextmanager
@@ -52,12 +53,45 @@ _DATA_PATH = os.environ.get("H1B_DATA_PATH", _DEFAULT_DATA)
 _df: Optional[pd.DataFrame] = None
 
 
+async def _warm_jsearch_cache() -> None:
+    """Pre-fetch the default JSearch query so the first dashboard load is instant."""
+    import httpx
+
+    if not _JSEARCH_KEY:
+        return
+    params = {
+        "query": "software engineer",
+        "page": "1",
+        "num_pages": "1",
+        "country": "us",
+        "date_posted": "all",
+    }
+    ck = _cache_key(**params)
+    if _jsearch_cache.get(ck) and _jsearch_cache[ck][0] > _time.time():
+        return  # already cached
+    try:
+        headers = {
+            "x-rapidapi-host": _JSEARCH_HOST,
+            "x-rapidapi-key": _JSEARCH_KEY,
+            "Content-Type": "application/json",
+        }
+        async with httpx.AsyncClient(timeout=30) as client:
+            resp = await client.get(_JSEARCH_URL, params=params, headers=headers)
+            resp.raise_for_status()
+            _jsearch_cache[ck] = (_time.time() + _CACHE_TTL, resp.json())
+        print("  JSearch cache warmed for default query.")
+    except Exception as e:
+        print(f"  JSearch cache warm failed (non-fatal): {e}")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global _df
     print(f"  Loading employer data from {_DATA_PATH} ...")
     _df = load_employers(_DATA_PATH)
     print(f"  Ready — {len(_df):,} employers loaded.")
+    # Warm JSearch cache in background so first dashboard load is fast
+    asyncio.create_task(_warm_jsearch_cache())
     yield
     # nothing to tear down
 
@@ -94,7 +128,7 @@ _JSEARCH_URL = f"https://{_JSEARCH_HOST}/search"
 import time as _time
 
 _jsearch_cache: dict[str, tuple[float, dict]] = {}   # key → (expires_at, data)
-_CACHE_TTL = 300  # 5 minutes
+_CACHE_TTL = 3600  # 60 minutes — job listings don't change often
 
 
 def _cache_key(**kwargs) -> str:
